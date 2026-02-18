@@ -154,7 +154,7 @@ header{animation:fu .45s ease both}
 
 <header>
   <div>
-    <div class="h-title">Analisi Costi Produzione<span>Distillerie &amp; Utilities</span></div>
+    <div class="h-title">Analisi Costi Produzione<span>Distillerie &amp; Utilities &nbsp;<span style="font-style:normal;font-size:0.55em;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:300;letter-spacing:.01em;vertical-align:middle">— Simone Gatto</span></span></div>
   </div>
   <div class="h-meta">
     <span class="badge">live calculator</span><br><br>
@@ -353,27 +353,95 @@ header{animation:fu .45s ease both}
     <div><div class="card-title">Depurazione</div><div class="card-sub">Impianto Trattamento Acque</div></div>
   </div>
   <div class="card-body">
-    <div class="sec-label">Parametri impianto (fissi)</div>
-    <div class="p-row"><span class="p-label">Volume annuale</span>       <div class="p-val">64.800</div><span class="p-um">m³/a</span></div>
-    <div class="p-row"><span class="p-label">COD ingresso</span>         <div class="p-val">8.000</div><span class="p-um">mg/L</span></div>
-    <div class="p-row"><span class="p-label">COD uscita limite</span>    <div class="p-val">200</div><span class="p-um">mg/L</span></div>
-    <div class="p-row"><span class="p-label">Energia elettrica</span>    <div class="p-val">700.800</div><span class="p-um">kWh/a</span></div>
-    <div class="sec-label">Consumi chimici annui</div>
-    <div class="p-row"><span class="p-label">Calce</span>                <div class="p-val">30.000</div><span class="p-um">kg/a</span></div>
-    <div class="p-row"><span class="p-label">HCl</span>                  <div class="p-val">3.200</div><span class="p-um">kg/a</span></div>
-    <div class="p-row"><span class="p-label">Ipoclorito</span>           <div class="p-val">750</div><span class="p-um">kg/a</span></div>
-    <div class="p-row"><span class="p-label">Polielettrolita</span>      <div class="p-val">1.500</div><span class="p-um">kg/a</span></div>
-    <div class="p-row"><span class="p-label">Nutrienti batteri</span>    <div class="p-val">5.200</div><span class="p-um">kg/a</span></div>
-    <div class="p-row"><span class="p-label">Fanghi smaltiti</span>      <div class="p-val">490</div><span class="p-um">ton/a</span></div>
-    <div class="sec-label">Personale annuo (ore)</div>
-    <div class="p-row"><span class="p-label">Operai</span>               <div class="p-val">1.275</div><span class="p-um">h/a</span></div>
-    <div class="p-row"><span class="p-label">Laboratorio</span>          <div class="p-val">51</div><span class="p-um">h/a</span></div>
-    <div class="p-row"><span class="p-label">Assistenti</span>           <div class="p-val">204</div><span class="p-um">h/a</span></div>
-    <div class="p-row"><span class="p-label">Direttore</span>            <div class="p-val">510</div><span class="p-um">h/a</span></div>
-    <div class="p-row"><span class="p-label">MTZ + altri</span>          <div class="p-val">15.000</div><span class="p-um">€/a</span></div>
-    <div class="kpi-grid">
+
+    <!-- PARAMETRI IMPIANTO -->
+    <div class="sec-label">Parametri impianto</div>
+    <div class="p-row"><span class="p-label">Capacità trattamento</span>    <input class="p-input teal" id="dep_cap"  type="number" step="10"   value="216"  min="1"><span class="p-um">m³/g</span></div>
+    <div class="p-row"><span class="p-label">Ore funzionamento/g</span>      <input class="p-input teal" id="dep_ore"  type="number" step="1"    value="24"   min="1"><span class="p-um">h/g</span></div>
+    <div class="p-row"><span class="p-label">Giorni lavorativi/anno</span>   <input class="p-input teal" id="dep_gg"   type="number" step="1"    value="300"  min="1"><span class="p-um">g/a</span></div>
+    <div class="p-row"><span class="p-label">Volume annuale trattato</span>  <div class="p-val-derived" id="dep_vol_ann">—</div><span class="p-um">m³/a</span></div>
+
+    <!-- CARATTERIZZAZIONE REFLUO -->
+    <div class="sec-label">Caratterizzazione refluo</div>
+    <div class="p-row"><span class="p-label">COD in ingresso</span>          <input class="p-input teal" id="dep_cod_in"  type="number" step="100"  value="8000" min="0"><span class="p-um">mg/L</span></div>
+    <div class="p-row"><span class="p-label">COD in uscita (limite)</span>   <input class="p-input teal" id="dep_cod_out" type="number" step="10"   value="200"  min="0"><span class="p-um">mg/L</span></div>
+    <div class="p-row"><span class="p-label">COD rimosso</span>              <div class="p-val-derived" id="dep_cod_rim">—</div><span class="p-um">mg/L</span></div>
+    <div class="p-row"><span class="p-label">COD rimosso annuo</span>        <div class="p-val-derived" id="dep_cod_ann">—</div><span class="p-um">kg/a</span></div>
+
+    <!-- INVESTIMENTO / AMMORTAMENTO -->
+    <div class="sec-label">Investimento iniziale</div>
+    <div class="p-row"><span class="p-label">Costo impianto</span>           <input class="p-input teal" id="dep_costo_imp" type="number" step="10000" value="1"   min="0"><span class="p-um">€</span></div>
+    <div class="p-row"><span class="p-label">Vita utile</span>               <input class="p-input teal" id="dep_vita"      type="number" step="1"    value="1"   min="1"><span class="p-um">anni</span></div>
+    <div class="p-row"><span class="p-label">Valore residuo</span>           <input class="p-input teal" id="dep_residuo"   type="number" step="1000" value="1"   min="0"><span class="p-um">€</span></div>
+    <div class="p-row"><span class="p-label">Ammortamento annuale</span>     <div class="p-val-derived" id="dep_amm">—</div><span class="p-um">€/a</span></div>
+
+    <!-- ENERGIA ELETTRICA (foglio Energia) -->
+    <div class="sec-label">Energia elettrica</div>
+    <div class="p-row"><span class="p-label">Pompe princ. Dep 1-2</span>    <input class="p-input teal" id="dep_e1" type="number" step="0.1" value="36.76" min="0"><span class="p-um">kW</span></div>
+    <div class="p-row"><span class="p-label">Soffianti Dep 1-2</span>        <input class="p-input teal" id="dep_e2" type="number" step="0.1" value="29.41" min="0"><span class="p-um">kW</span></div>
+    <div class="p-row"><span class="p-label">Pompe princ. Dep 3</span>       <input class="p-input teal" id="dep_e3" type="number" step="0.1" value="2.94"  min="0"><span class="p-um">kW</span></div>
+    <div class="p-row"><span class="p-label">Soffiante grande Dep 3</span>   <input class="p-input teal" id="dep_e4" type="number" step="0.1" value="29.41" min="0"><span class="p-um">kW</span></div>
+    <div class="p-row"><span class="p-label">Soffiante piccola Dep 3</span>  <input class="p-input teal" id="dep_e5" type="number" step="0.1" value="21.48" min="0"><span class="p-um">kW</span></div>
+    <div class="p-row"><span class="p-label">Potenza totale</span>           <div class="p-val-derived" id="dep_el_kw">—</div><span class="p-um">kW</span></div>
+    <div class="p-row"><span class="p-label">Consumo annuo</span>            <div class="p-val-derived" id="dep_el_kwh">—</div><span class="p-um">kWh/a</span></div>
+    <div class="p-row"><span class="p-label">Costo energetico</span>         <div class="p-val-derived" id="dep_el_cost">—</div><span class="p-um">€/a</span></div>
+
+    <!-- PRODOTTI CHIMICI (foglio Chimici — dosaggi g/m³) -->
+    <div class="sec-label">Prodotti chimici — dosaggi (g/m³)</div>
+    <div class="p-row"><span class="p-label">Polielettrolita</span>          <input class="p-input teal" id="dep_d_poli"  type="number" step="1"   value="62"   min="0"><span class="p-um">g/m³</span></div>
+    <div class="p-row"><span class="p-label">Calce</span>                    <input class="p-input teal" id="dep_d_calce" type="number" step="1"   value="148"  min="0"><span class="p-um">g/m³</span></div>
+    <div class="p-row"><span class="p-label">Nutrienti batteri</span>        <input class="p-input teal" id="dep_d_nutr"  type="number" step="0.1" value="8.35" min="0"><span class="p-um">g/m³</span></div>
+    <div class="p-row"><span class="p-label">Ipoclorito</span>               <input class="p-input teal" id="dep_d_ipo"   type="number" step="0.5" value="10"   min="0"><span class="p-um">g/m³</span></div>
+    <div class="p-row"><span class="p-label">Soda</span>                     <input class="p-input teal" id="dep_d_soda"  type="number" step="10"  value="830"  min="0"><span class="p-um">g/m³</span></div>
+    <div class="p-row"><span class="p-label">Acido Solforico</span>          <input class="p-input teal" id="dep_d_acido" type="number" step="5"   value="198"  min="0"><span class="p-um">g/m³</span></div>
+    <div class="p-row"><span class="p-label">→ Costo chimici tot.</span>     <div class="p-val-derived" id="dep_chim_cost">—</div><span class="p-um">€/a</span></div>
+
+    <!-- PERSONALE (foglio Personale — ore/settimana × 51 settimane) -->
+    <div class="sec-label">Personale — ore/settimana</div>
+    <div class="p-row"><span class="p-label">Operai</span>                   <input class="p-input teal" id="dep_p_op"  type="number" step="0.5" value="30"  min="0"><span class="p-um">h/sett</span></div>
+    <div class="p-row"><span class="p-label">Laboratorio</span>              <input class="p-input teal" id="dep_p_lab" type="number" step="0.5" value="1"   min="0"><span class="p-um">h/sett</span></div>
+    <div class="p-row"><span class="p-label">Assistenti</span>               <input class="p-input teal" id="dep_p_ass" type="number" step="0.5" value="0.5" min="0"><span class="p-um">h/sett</span></div>
+    <div class="p-row"><span class="p-label">Dir. Tecnico</span>             <input class="p-input teal" id="dep_p_dir" type="number" step="0.5" value="5"   min="0"><span class="p-um">h/sett</span></div>
+    <div class="p-row"><span class="p-label">→ Costo personale tot.</span>   <div class="p-val-derived" id="dep_pers_cost">—</div><span class="p-um">€/a</span></div>
+
+    <!-- MANUTENZIONE (foglio Mtz) -->
+    <div class="sec-label">Manutenzione</div>
+    <div class="p-row"><span class="p-label">MTZ ordinaria</span>            <input class="p-input teal" id="dep_mtz1" type="number" step="100" value="180"   min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Ricambi e consumabili</span>    <input class="p-input teal" id="dep_mtz2" type="number" step="100" value="10000" min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Analisi laboratorio</span>      <input class="p-input teal" id="dep_mtz3" type="number" step="50"  value="170"   min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">MTZ straordinaria</span>        <input class="p-input teal" id="dep_mtz4" type="number" step="100" value="890"   min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Pulizia vasche</span>           <input class="p-input teal" id="dep_mtz5" type="number" step="100" value="900"   min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">→ Costo MTZ tot.</span>         <div class="p-val-derived" id="dep_mtz_cost">—</div><span class="p-um">€/a</span></div>
+
+    <!-- SMALTIMENTO FANGHI (foglio Smaltimento) -->
+    <div class="sec-label">Smaltimento fanghi</div>
+    <div class="p-row"><span class="p-label">Produzione fanghi</span>        <input class="p-input teal" id="dep_s_prod"  type="number" step="0.1"  value="5.865" min="0"><span class="p-um">kg/m³</span></div>
+    <div class="p-row"><span class="p-label">Produzione annua fanghi</span>  <div class="p-val-derived" id="dep_s_ton">—</div><span class="p-um">ton/a</span></div>
+    <div class="p-row"><span class="p-label">→ Costo smaltimento</span>      <div class="p-val-derived" id="dep_s_cost">—</div><span class="p-um">€/a</span></div>
+
+    <!-- ALTRI COSTI (foglio Altri_Costi) -->
+    <div class="sec-label">Altri costi operativi</div>
+    <div class="p-row"><span class="p-label">Certificazioni e permessi</span><input class="p-input teal" id="dep_a1" type="number" step="100" value="2000" min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Servizi amministrativi</span>   <input class="p-input teal" id="dep_a2" type="number" step="100" value="3000" min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Consulenze tecniche</span>      <input class="p-input teal" id="dep_a3" type="number" step="100" value="0"    min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Utenze (acqua, gas)</span>      <input class="p-input teal" id="dep_a4" type="number" step="100" value="0"    min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Formazione personale</span>     <input class="p-input teal" id="dep_a5" type="number" step="100" value="0"    min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">→ Altri costi tot.</span>       <div class="p-val-derived" id="dep_altri_cost">—</div><span class="p-um">€/a</span></div>
+
+    <!-- RIEPILOGO -->
+    <div class="sec-label">Riepilogo costi annuali</div>
+    <div class="p-row"><span class="p-label">Ammortamento</span>             <div class="p-val-derived" id="dep_r_amm">—</div><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Energia elettrica</span>        <div class="p-val-derived" id="dep_r_ee">—</div><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Prodotti chimici</span>         <div class="p-val-derived" id="dep_r_chim">—</div><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Personale</span>               <div class="p-val-derived" id="dep_r_pers">—</div><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Manutenzione</span>             <div class="p-val-derived" id="dep_r_mtz">—</div><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Smaltimento fanghi</span>       <div class="p-val-derived" id="dep_r_smalt">—</div><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Altri costi</span>              <div class="p-val-derived" id="dep_r_altri">—</div><span class="p-um">€/a</span></div>
+
+    <div class="kpi-grid" style="grid-template-columns:1fr 1fr 1fr">
       <div class="kpi"><div class="kpi-label">Costo €/kg COD rimosso</div><div class="kpi-val teal" id="dep_cod">—</div><div class="kpi-um">€/kg COD</div></div>
       <div class="kpi"><div class="kpi-label">Costo Totale Annuale</div><div class="kpi-val teal" id="dep_ann">—</div><div class="kpi-um">€/anno</div></div>
+      <div class="kpi"><div class="kpi-label">Costo per m³ trattato</div><div class="kpi-val teal" id="dep_mc">—</div><div class="kpi-um">€/m³</div></div>
     </div>
   </div>
 </div>
@@ -433,10 +501,7 @@ const SAN_EL = { pv:13, ri:17.46, pi:4.48, pz:6, cen:15, serb:1.5, torre:15, tf:
 // JOE: pompe=[5.6,1.5,4,3,1.3,1.3,7.5], centrifuga=3; util: serb=1.5, torre=12(×0.1), trivella=7, chiller=40(×0.1), pg=6(×0.1)
 const JOE_EL = { pompe:[5.6,1.5,4,3,1.3,1.3,7.5], cen:3, serb:1.5, torre:12, tf:0.1, trivella:7, chiller:40, cf:0.1, pg:6, pgf:0.1 };
 
-// DEPURAZIONE — consumi fissi annui
-const DEP = { kwh:700800, calce:30000, hcl:3200, ipo:750, poli:1500, nutr:5200, fanghi:490,
-              ore_op:1275, ore_lab:51, ore_ass:204, ore_dir:510, mtz:10000, altri:5000,
-              mc:64800, cod_in:8000, cod_out:200 };
+// DEPURAZIONE — costanti rimosse: tutto letto da input HTML
 
 let joeType = 'torchiato';
 
@@ -533,22 +598,95 @@ function calc(){
   s('v_tonn', fmt2(vap_tonn));
 
   // ────────────────────────────────────────
-  //  DEPURAZIONE
+  //  DEPURAZIONE — replica esatta struttura Excel:
+  //  Dashboard Dep. → Energia → Chimici → Personale → Mtz → Smaltimento → Altri_Costi
   // ────────────────────────────────────────
-  const dep_ee     = DEP.kwh    * ee;
-  const dep_calce  = DEP.calce  * calce_p;
-  const dep_hcl    = DEP.hcl    * hcl_p;
-  const dep_ipo    = DEP.ipo    * ipo_p;
-  const dep_poli   = DEP.poli   * poli_p;
-  const dep_nutr   = DEP.nutr   * nutr_p;
-  const dep_fanghi = DEP.fanghi * fanghi_p;
-  const dep_pers   = DEP.ore_op*op + DEP.ore_lab*lab + DEP.ore_ass*ass + DEP.ore_dir*dir;
-  const dep_tot    = dep_ee+dep_calce+dep_hcl+dep_ipo+dep_poli+dep_nutr+dep_fanghi+dep_pers+DEP.mtz+DEP.altri;
-  const dep_cod_tot= DEP.mc*(DEP.cod_in-DEP.cod_out)/1000;     // kg COD rimosso/anno
-  const dep_ckg    = dep_cod_tot>0 ? dep_tot/dep_cod_tot : 0;  // €/kg COD
 
+  // — Parametri impianto (Dashboard Dep. B5,B6,B7,B8)
+  const dep_cap     = g('dep_cap');    // m³/g
+  const dep_ore     = g('dep_ore');    // ore/g
+  const dep_gg      = g('dep_gg');     // giorni/anno
+  const dep_vol     = dep_cap * dep_gg; // B8=B5*B7 → m³/anno
+
+  // — Caratterizzazione refluo (Dashboard Dep. E15,E16,E17,E19)
+  const dep_cod_in  = g('dep_cod_in');
+  const dep_cod_out = g('dep_cod_out');
+  const dep_cod_rim_conc = dep_cod_in - dep_cod_out;            // E17=E15-E16 mg/L
+  const dep_cod_ann_kg   = dep_cod_rim_conc * dep_vol / 1000;   // E19=E17*B8/1000 kg/anno
+
+  // — Ammortamento (Dashboard Dep. D5-D9 / E9=(E5-E8)/E6)
+  const dep_costo_imp = g('dep_costo_imp');
+  const dep_vita      = g('dep_vita');
+  const dep_residuo   = g('dep_residuo');
+  const dep_amm_ann   = dep_vita>0 ? (dep_costo_imp - dep_residuo) / dep_vita : 0; // E9
+
+  // — Energia elettrica (foglio Energia: B9=SUM kW, B13=B9*B11*B12, B17=B13*B15)
+  const dep_e_kw = g('dep_e1')+g('dep_e2')+g('dep_e3')+g('dep_e4')+g('dep_e5'); // B9
+  const dep_kwh  = dep_e_kw * dep_ore * dep_gg;                 // B13=B9*ore*gg
+  const dep_ee_cost = dep_kwh * ee;                             // B17=B13*B15
+
+  // — Prodotti chimici (foglio Chimici: consumo=dosaggio*vol/1000 kg, costo=consumo*prezzo)
+  // dosaggi in g/m³ → consumo kg = dosaggio * vol_annuo / 1000
+  const dep_c_poli  = g('dep_d_poli')  * dep_vol / 1000 * poli_p;
+  const dep_c_calce = g('dep_d_calce') * dep_vol / 1000 * calce_p;
+  const dep_c_nutr  = g('dep_d_nutr')  * dep_vol / 1000 * nutr_p;
+  const dep_c_ipo   = g('dep_d_ipo')   * dep_vol / 1000 * ipo_p;
+  const dep_c_soda  = g('dep_d_soda')  * dep_vol / 1000 * g('u_soda');
+  const dep_c_acido = g('dep_d_acido') * dep_vol / 1000 * g('u_acido');
+  const dep_chim_tot = dep_c_poli+dep_c_calce+dep_c_nutr+dep_c_ipo+dep_c_soda+dep_c_acido; // E11=SUM(E4:E9) nota: no margine 10% nel file
+
+  // — Personale (foglio Personale: ore_anno=ore_sett*51, costo=ore_anno*tariffa)
+  const SETT = 51;
+  const dep_pers_op  = g('dep_p_op')  * SETT * op;
+  const dep_pers_lab = g('dep_p_lab') * SETT * lab;
+  const dep_pers_ass = g('dep_p_ass') * SETT * ass;
+  const dep_pers_dir = g('dep_p_dir') * SETT * dir;
+  const dep_pers_tot = dep_pers_op+dep_pers_lab+dep_pers_ass+dep_pers_dir; // F9=SUM(F4:F7)
+
+  // — Manutenzione (foglio Mtz: B9=SUM(B4:B8))
+  const dep_mtz_tot = g('dep_mtz1')+g('dep_mtz2')+g('dep_mtz3')+g('dep_mtz4')+g('dep_mtz5');
+
+  // — Smaltimento fanghi (foglio Smaltimento: B5=B3*B4/1000 ton, B9=B5*B7)
+  const dep_s_prod  = g('dep_s_prod'); // kg/m³
+  const dep_s_ton   = dep_s_prod * dep_vol / 1000; // B5=B3*B4/1000
+  const dep_s_cost  = dep_s_ton * g('u_fanghi');   // B9=B5*B7
+
+  // — Altri costi (foglio Altri_Costi: B10=SUM(B4:B9))
+  const dep_altri_tot = g('dep_a1')+g('dep_a2')+g('dep_a3')+g('dep_a4')+g('dep_a5');
+
+  // — TOTALE (Dashboard Dep. B18=SUM(B11:B17))
+  const dep_tot = dep_amm_ann + dep_ee_cost + dep_chim_tot + dep_pers_tot + dep_mtz_tot + dep_s_cost + dep_altri_tot;
+
+  // — INDICATORI (Dashboard Dep. E23=B18/E19,  B21=B18/B8)
+  const dep_ckg  = dep_cod_ann_kg>0 ? dep_tot/dep_cod_ann_kg : 0; // €/kg COD rimosso
+  const dep_mc_v = dep_vol>0 ? dep_tot/dep_vol : 0;               // €/m³
+
+  // — Aggiorna UI calcoli intermedi
+  s('dep_vol_ann',    fmtK(dep_vol));
+  s('dep_cod_rim',    dep_cod_rim_conc.toLocaleString('it-IT'));
+  s('dep_cod_ann',    fmtK(dep_cod_ann_kg));
+  s('dep_amm',        fmtK(dep_amm_ann));
+  s('dep_el_kw',      dep_e_kw.toFixed(2));
+  s('dep_el_kwh',     fmtK(dep_kwh));
+  s('dep_el_cost',    fmtK(dep_ee_cost));
+  s('dep_chim_cost',  fmtK(dep_chim_tot));
+  s('dep_pers_cost',  fmtK(dep_pers_tot));
+  s('dep_mtz_cost',   fmtK(dep_mtz_tot));
+  s('dep_s_ton',      dep_s_ton.toFixed(1));
+  s('dep_s_cost',     fmtK(dep_s_cost));
+  s('dep_altri_cost', fmtK(dep_altri_tot));
+  // riepilogo
+  s('dep_r_amm',   fmtK(dep_amm_ann));
+  s('dep_r_ee',    fmtK(dep_ee_cost));
+  s('dep_r_chim',  fmtK(dep_chim_tot));
+  s('dep_r_pers',  fmtK(dep_pers_tot));
+  s('dep_r_mtz',   fmtK(dep_mtz_tot));
+  s('dep_r_smalt', fmtK(dep_s_cost));
+  s('dep_r_altri', fmtK(dep_altri_tot));
+  // KPI
   s('dep_cod', fmt4(dep_ckg));
   s('dep_ann', fmtK(dep_tot));
+  s('dep_mc',  fmt2(dep_mc_v));
 
   // ────────────────────────────────────────
   //  PILATO
