@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analisi Costi — Distillerie</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d1117; --surf:#161b22; --surf2:#1c2330; --bord:rgba(255,255,255,0.07);
+  --blue:#4f9cf9; --green:#3fcf8e; --orange:#f97316; --purple:#a78bfa;
+  --red:#fb7185; --teal:#22d3ee; --yellow:#fbbf24;
+  --text:#e6edf3; --muted:#7d8590; --dim:#4d5566;
+  --ib:rgba(79,156,249,.18); --if:rgba(79,156,249,.55);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;
+  background-image:radial-gradient(ellipse 80% 50% at 15% -5%,rgba(79,156,249,.07) 0,transparent 60%),
+  radial-gradient(ellipse 60% 40% at 85% 110%,rgba(63,207,142,.05) 0,transparent 50%)}
+
+/* ── HEADER ── */
+header{padding:40px 44px 0;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.h-title{font-family:'DM Serif Display',serif;font-size:clamp(26px,3.5vw,42px);letter-spacing:-.02em;line-height:1.1}
+.h-title span{display:block;font-style:italic;color:var(--blue)}
+.h-meta{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:right;line-height:1.9}
+.badge{display:inline-block;background:rgba(79,156,249,.1);border:1px solid rgba(79,156,249,.3);
+  color:var(--blue);font-family:'DM Mono',monospace;font-size:10px;padding:3px 9px;
+  border-radius:4px;letter-spacing:.08em;text-transform:uppercase}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--bord) 20%,var(--bord) 80%,transparent);margin:28px 44px}
+
+/* ── LAYOUT ── */
+.wrap{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;padding:0 44px 48px}
+
+/* ── CARDS ── */
+.card{background:var(--surf);border:1px solid var(--bord);border-radius:14px;overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:rgba(255,255,255,.11)}
+.card-head{padding:15px 20px 12px;border-bottom:1px solid var(--bord);display:flex;align-items:center;gap:10px}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.card-title{font-family:'DM Serif Display',serif;font-size:17px;font-weight:400}
+.card-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
+.card-body{padding:16px 20px}
+
+/* colours per section */
+.c-blue  .dot{background:var(--blue);box-shadow:0 0 7px var(--blue)}   .c-blue .card-title{color:var(--blue)}   .c-blue .card-head{background:linear-gradient(135deg,rgba(79,156,249,.08),transparent)}
+.c-orange .dot{background:var(--orange);box-shadow:0 0 7px var(--orange)} .c-orange .card-title{color:var(--orange)} .c-orange .card-head{background:linear-gradient(135deg,rgba(249,115,22,.08),transparent)}
+.c-purple .dot{background:var(--purple);box-shadow:0 0 7px var(--purple)} .c-purple .card-title{color:var(--purple)} .c-purple .card-head{background:linear-gradient(135deg,rgba(167,139,250,.08),transparent)}
+.c-teal  .dot{background:var(--teal);box-shadow:0 0 7px var(--teal)}   .c-teal .card-title{color:var(--teal)}   .c-teal .card-head{background:linear-gradient(135deg,rgba(34,211,238,.08),transparent)}
+.c-red   .dot{background:var(--red);box-shadow:0 0 7px var(--red)}    .c-red .card-title{color:var(--red)}    .c-red .card-head{background:linear-gradient(135deg,rgba(251,113,133,.08),transparent)}
+.c-green .dot{background:var(--green);box-shadow:0 0 7px var(--green)}  .c-green .card-title{color:var(--green)}  .c-green .card-head{background:linear-gradient(135deg,rgba(63,207,142,.08),transparent)}
+
+/* ── SECTIONS inside card ── */
+.sec-label{font-family:'DM Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--dim);margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--bord)}
+.sec-label:first-child{margin-top:0}
+
+/* ── PARAM ROW ── */
+.p-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:4px 0}
+.p-label{font-size:12.5px;color:var(--muted);line-height:1.3}
+.p-input{background:var(--bg);border:1px solid var(--ib);border-radius:6px;
+  color:var(--blue);font-family:'DM Mono',monospace;font-size:12.5px;font-weight:500;
+  padding:4px 7px;width:78px;text-align:right;outline:none;transition:border-color .15s,box-shadow .15s}
+.p-input:focus{border-color:var(--if);box-shadow:0 0 0 3px rgba(79,156,249,.1)}
+.p-input.orange{color:var(--orange);border-color:rgba(249,115,22,.25)} .p-input.orange:focus{border-color:rgba(249,115,22,.6);box-shadow:0 0 0 3px rgba(249,115,22,.1)}
+.p-input.purple{color:var(--purple);border-color:rgba(167,139,250,.25)} .p-input.purple:focus{border-color:rgba(167,139,250,.6);box-shadow:0 0 0 3px rgba(167,139,250,.1)}
+.p-input.teal{color:var(--teal);border-color:rgba(34,211,238,.25)}     .p-input.teal:focus{border-color:rgba(34,211,238,.6);box-shadow:0 0 0 3px rgba(34,211,238,.1)}
+.p-input.red{color:var(--red);border-color:rgba(251,113,133,.25)}      .p-input.red:focus{border-color:rgba(251,113,133,.6);box-shadow:0 0 0 3px rgba(251,113,133,.1)}
+.p-um{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);width:44px;text-align:left}
+.p-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:right;width:78px;padding:4px 7px}
+.p-val-derived{font-family:'DM Mono',monospace;font-size:12px;color:var(--text);text-align:right;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:5px;
+  padding:3px 7px;width:78px;min-height:26px}
+
+/* ── TOGGLE PRODOTTO ── */
+.toggle-row{display:flex;gap:6px;margin-bottom:4px}
+.toggle-btn{flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--bord);
+  background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;
+  cursor:pointer;transition:all .18s;letter-spacing:.04em}
+.toggle-btn:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.toggle-btn.active-torchiato{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.45);color:var(--purple);font-weight:500}
+.toggle-btn.active-scarichi{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.45);color:var(--red);font-weight:500}
+
+/* ── RISULTATI KPI ── */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bord);margin-top:16px;border-radius:10px;overflow:hidden}
+.kpi{background:var(--surf2);padding:14px 16px 15px;transition:background .15s}
+.kpi:hover{background:rgba(255,255,255,.02)}
+.kpi-label{font-family:'DM Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:7px;line-height:1.4}
+.kpi-val{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;line-height:1;letter-spacing:-.02em;margin-bottom:2px;transition:opacity .15s}
+.kpi-um{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim)}
+.kpi-val.blue{color:var(--blue)} .kpi-val.orange{color:var(--orange)} .kpi-val.purple{color:var(--purple)}
+.kpi-val.teal{color:var(--teal)} .kpi-val.red{color:var(--red)} .kpi-val.green{color:var(--green)}
+
+/* ── BAR CHART ── */
+.breakdown{margin-top:14px}
+.br-title{font-family:'DM Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:8px}
+.br-row{display:grid;grid-template-columns:72px 1fr 40px;align-items:center;gap:8px;margin-bottom:5px}
+.br-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+.br-bar-bg{background:rgba(255,255,255,.05);border-radius:3px;height:5px;overflow:hidden}
+.br-bar{height:100%;border-radius:3px;transition:width .35s ease;width:0}
+.br-pct{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);text-align:right}
+
+/* ── BOTTOM ROW ── */
+.wrap-bottom{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:0 44px 48px;margin-top:-20px}
+
+/* ── COSTI UNITARI ── */
+.wrap-cu{padding:0 44px 24px}
+.cu-card{background:var(--surf);border:1px solid var(--bord);border-radius:14px;overflow:hidden}
+.cu-head{padding:13px 20px 11px;border-bottom:1px solid var(--bord);display:flex;align-items:center;gap:10px}
+.cu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.cu-col{padding:14px 18px;border-right:1px solid var(--bord)}
+.cu-col:last-child{border-right:none}
+
+/* ── NOTE ── */
+.note{margin:0 44px 44px;padding:12px 18px;background:rgba(79,156,249,.04);
+  border:1px solid rgba(79,156,249,.13);border-radius:8px;font-size:11.5px;
+  color:var(--muted);font-family:'DM Mono',monospace;line-height:1.7}
+.note strong{color:var(--blue)}
+
+/* ── ANIMATIONS ── */
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+header{animation:fu .45s ease both}
+.wrap-cu{animation:fu .45s .05s ease both}
+.card:nth-child(1){animation:fu .45s .1s ease both}
+.card:nth-child(2){animation:fu .45s .17s ease both}
+.card:nth-child(3){animation:fu .45s .24s ease both}
+.wrap-bottom .card:nth-child(1){animation:fu .45s .3s ease both}
+.wrap-bottom .card:nth-child(2){animation:fu .45s .37s ease both}
+
+@keyframes bk{0%{opacity:.3}100%{opacity:1}}
+.blink{animation:bk .22s ease}
+
+/* ── JOE tipo change animation ── */
+.type-change{animation:tc .3s ease}
+@keyframes tc{0%{opacity:.2;transform:scale(.97)}100%{opacity:1;transform:scale(1)}}
+
+@media(max-width:1100px){
+  .wrap{grid-template-columns:1fr 1fr}
+  .wrap-bottom{grid-template-columns:1fr}
+  .cu-grid{grid-template-columns:repeat(2,1fr)}
+  .cu-col:nth-child(2){border-right:none}
+  .cu-col{border-bottom:1px solid var(--bord)}
+  .cu-col:last-child{border-bottom:none;border-right:none}
+}
+@media(max-width:700px){
+  header,.wrap,.wrap-bottom,.wrap-cu,.note{padding-left:16px;padding-right:16px}
+  .divider{margin-left:16px;margin-right:16px}
+  .wrap{grid-template-columns:1fr}
+  .cu-grid{grid-template-columns:1fr}
+  .kpi-val{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="h-title">Analisi Costi Produzione<span>Distillerie &amp; Utilities</span></div>
+  </div>
+  <div class="h-meta">
+    <span class="badge">live calculator</span><br><br>
+    Aggiornato alle <strong id="ts">—</strong><br>
+    Tutti i valori si aggiornano in tempo reale
+  </div>
+</header>
+<div class="divider"></div>
+
+<!-- ===== COSTI UNITARI MASTER ===== -->
+<div class="wrap-cu">
+  <div class="cu-card c-green card">
+    <div class="cu-head">
+      <div class="dot" style="background:var(--green);box-shadow:0 0 7px var(--green)"></div>
+      <div>
+        <div class="card-title" style="color:var(--green);font-family:'DM Serif Display',serif;font-size:16px">Costi Unitari — Foglio Master</div>
+        <div class="card-sub">I valori qui sotto aggiornano tutti i calcoli dei tre distillatori</div>
+      </div>
+    </div>
+    <div class="cu-grid">
+      <div class="cu-col">
+        <div class="sec-label">Energia &amp; GPL</div>
+        <div class="p-row"><span class="p-label">Energia elettrica</span><input class="p-input" id="u_ee" type="number" step="0.005" value="0.21" min="0"><span class="p-um">€/kWh</span></div>
+        <div class="p-row"><span class="p-label">GPL netto accise</span><input class="p-input" id="u_gpl" type="number" step="0.01" value="0.91" min="0"><span class="p-um">€/kg</span></div>
+        <div class="p-row"><span class="p-label">Acqua trattata</span><input class="p-input" id="u_acqua" type="number" step="0.01" value="0.24" min="0"><span class="p-um">€/m³</span></div>
+      </div>
+      <div class="cu-col">
+        <div class="sec-label">Personale</div>
+        <div class="p-row"><span class="p-label">Operatore</span><input class="p-input" id="u_op" type="number" step="0.5" value="30" min="0"><span class="p-um">€/h</span></div>
+        <div class="p-row"><span class="p-label">Laboratorio</span><input class="p-input" id="u_lab" type="number" step="0.5" value="40" min="0"><span class="p-um">€/h</span></div>
+        <div class="p-row"><span class="p-label">Assistenti</span><input class="p-input" id="u_ass" type="number" step="0.5" value="35" min="0"><span class="p-um">€/h</span></div>
+        <div class="p-row"><span class="p-label">Direttore</span><input class="p-input" id="u_dir" type="number" step="0.5" value="50" min="0"><span class="p-um">€/h</span></div>
+      </div>
+      <div class="cu-col">
+        <div class="sec-label">Smaltimento &amp; Chimici</div>
+        <div class="p-row"><span class="p-label">Smaltimento fanghi</span><input class="p-input" id="u_fanghi" type="number" step="1" value="155" min="0"><span class="p-um">€/ton</span></div>
+        <div class="p-row"><span class="p-label">Polielettrolita</span><input class="p-input" id="u_poli" type="number" step="0.1" value="6.5" min="0"><span class="p-um">€/kg</span></div>
+        <div class="p-row"><span class="p-label">Calce (pH)</span><input class="p-input" id="u_calce" type="number" step="0.01" value="0.19" min="0"><span class="p-um">€/kg</span></div>
+        <div class="p-row"><span class="p-label">Nutrienti batteri</span><input class="p-input" id="u_nutr" type="number" step="0.01" value="1.923" min="0"><span class="p-um">€/kg</span></div>
+        <div class="p-row"><span class="p-label">Soda</span><input class="p-input" id="u_soda" type="number" step="0.01" value="0.55" min="0"><span class="p-um">€/kg</span></div>
+      </div>
+      <div class="cu-col">
+        <div class="sec-label">Chimici (cont.)</div>
+        <div class="p-row"><span class="p-label">Ipoclorito</span><input class="p-input" id="u_ipo" type="number" step="0.01" value="0.32" min="0"><span class="p-um">€/kg</span></div>
+        <div class="p-row"><span class="p-label">Acido Solforico</span><input class="p-input" id="u_acido" type="number" step="0.01" value="0.52" min="0"><span class="p-um">€/kg</span></div>
+        <div class="p-row"><span class="p-label">Acido Cloridrico</span><input class="p-input" id="u_hcl" type="number" step="0.01" value="0.35" min="0"><span class="p-um">€/kg</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 3 DISTILLATORI ===== -->
+<div class="wrap">
+
+<!-- ─── PILATO ─── -->
+<div class="card c-blue">
+  <div class="card-head">
+    <div class="dot"></div>
+    <div><div class="card-title">Pilato</div><div class="card-sub">Distillatore Batch</div></div>
+  </div>
+  <div class="card-body">
+    <div class="sec-label">Parametri di produzione</div>
+    <div class="p-row"><span class="p-label">Capacità lavorazione</span>    <input class="p-input" id="pil_cap"   type="number" step="50"  value="1000" min="1"><span class="p-um">Lt/h</span></div>
+    <div class="p-row"><span class="p-label">Volume totale trattato</span>   <input class="p-input" id="pil_vol"   type="number" step="100" value="6000" min="1"><span class="p-um">Lt</span></div>
+    <div class="p-row"><span class="p-label">Durata bollata</span>           <div class="p-val-derived" id="pil_dur">—</div><span class="p-um">h</span></div>
+    <div class="p-row"><span class="p-label">Portata vapore</span>           <input class="p-input" id="pil_vap_h" type="number" step="10"  value="375"  min="0"><span class="p-um">kg/h</span></div>
+    <div class="p-row"><span class="p-label">Impianti/operatore</span>       <input class="p-input" id="pil_imp"   type="number" step="0.5" value="1.5"  min="0.5"><span class="p-um">n°</span></div>
+    <div class="p-row"><span class="p-label">Conc. olio iniziale</span>      <input class="p-input" id="pil_conc"  type="number" step="0.1" value="4.0"  min="0"><span class="p-um">‰</span></div>
+
+    <div class="sec-label">Calcoli intermedi</div>
+    <div class="p-row"><span class="p-label">Q. olio recuperato</span>       <div class="p-val-derived" id="pil_olio">—</div><span class="p-um">kg</span></div>
+    <div class="p-row"><span class="p-label">Consumo vapore</span>           <div class="p-val-derived" id="pil_vap_tot">—</div><span class="p-um">kg</span></div>
+    <div class="p-row"><span class="p-label">Consumo elettrico tot.</span>   <div class="p-val-derived" id="pil_el_tot">—</div><span class="p-um">kWh</span></div>
+    <div class="p-row"><span class="p-label">COD prodotti</span>             <div class="p-val-derived" id="pil_cod">—</div><span class="p-um">kg</span></div>
+
+    <div class="sec-label">Manutenzione</div>
+    <div class="p-row"><span class="p-label">MTZ straordinaria</span>        <input class="p-input" id="pil_mtz_s" type="number" step="50"  value="300"  min="0"><span class="p-um">€/anno</span></div>
+    <div class="p-row"><span class="p-label">MTZ ordinaria</span>            <input class="p-input" id="pil_mtz_o" type="number" step="50"  value="200"  min="0"><span class="p-um">€/anno</span></div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Costo Totale Bollate</div><div class="kpi-val blue" id="pil_tot">—</div><div class="kpi-um">€</div></div>
+      <div class="kpi"><div class="kpi-label">Costo per Lt Distillato</div><div class="kpi-val blue" id="pil_ltr">—</div><div class="kpi-um">€/Lt</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="br-title">Ripartizione costi</div>
+      <div class="br-row"><span class="br-label">Vapore</span><div class="br-bar-bg"><div class="br-bar" id="pil_br_vap" style="background:var(--blue)"></div></div><span class="br-pct" id="pil_pct_vap">—</span></div>
+      <div class="br-row"><span class="br-label">Elettricità</span><div class="br-bar-bg"><div class="br-bar" id="pil_br_el"  style="background:var(--teal)"></div></div><span class="br-pct" id="pil_pct_el">—</span></div>
+      <div class="br-row"><span class="br-label">Personale</span><div class="br-bar-bg"><div class="br-bar" id="pil_br_pers" style="background:var(--green)"></div></div><span class="br-pct" id="pil_pct_pers">—</span></div>
+      <div class="br-row"><span class="br-label">COD/Soda</span><div class="br-bar-bg"><div class="br-bar" id="pil_br_cod"  style="background:var(--red)"></div></div><span class="br-pct" id="pil_pct_cod">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SANTORO ─── -->
+<div class="card c-orange">
+  <div class="card-head">
+    <div class="dot"></div>
+    <div><div class="card-title">Santoro</div><div class="card-sub">Distillatore Continuo</div></div>
+  </div>
+  <div class="card-body">
+    <div class="sec-label">Parametri di produzione</div>
+    <div class="p-row"><span class="p-label">Capacità lavorazione</span>    <input class="p-input orange" id="san_cap"    type="number" step="100" value="4200"  min="1"><span class="p-um">Lt/h</span></div>
+    <div class="p-row"><span class="p-label">Volume totale trattato</span>   <input class="p-input orange" id="san_vol"    type="number" step="500" value="16000" min="1"><span class="p-um">Lt</span></div>
+    <div class="p-row"><span class="p-label">Durata ciclo</span>             <div class="p-val-derived" id="san_dur">—</div><span class="p-um">h</span></div>
+    <div class="p-row"><span class="p-label">Portata vapore</span>           <input class="p-input orange" id="san_vap_h"  type="number" step="50"  value="1500"  min="0"><span class="p-um">kg/h</span></div>
+    <div class="p-row"><span class="p-label">Bx iniziale</span>              <input class="p-input orange" id="san_bxi"    type="number" step="0.5" value="9"     min="0"><span class="p-um">Bx</span></div>
+    <div class="p-row"><span class="p-label">Bx finale</span>               <input class="p-input orange" id="san_bxf"    type="number" step="0.5" value="18"    min="0.1"><span class="p-um">Bx</span></div>
+    <div class="p-row"><span class="p-label">Impianti/operatore</span>       <input class="p-input orange" id="san_imp"    type="number" step="0.5" value="1.5"   min="0.5"><span class="p-um">n°</span></div>
+    <div class="p-row"><span class="p-label">Conc. olio iniziale</span>      <input class="p-input orange" id="san_conci"  type="number" step="0.1" value="1.8"   min="0"><span class="p-um">‰</span></div>
+    <div class="p-row"><span class="p-label">Conc. olio uscita</span>        <input class="p-input orange" id="san_concu"  type="number" step="0.1" value="0.2"   min="0"><span class="p-um">‰</span></div>
+
+    <div class="sec-label">Calcoli intermedi</div>
+    <div class="p-row"><span class="p-label">Q. olio recuperato</span>       <div class="p-val-derived" id="san_olio">—</div><span class="p-um">Lt</span></div>
+    <div class="p-row"><span class="p-label">Vapore consumato</span>          <div class="p-val-derived" id="san_vap_tot">—</div><span class="p-um">kg</span></div>
+    <div class="p-row"><span class="p-label">Consumo elettrico tot.</span>    <div class="p-val-derived" id="san_el_tot">—</div><span class="p-um">kWh</span></div>
+
+    <div class="sec-label">Manutenzione</div>
+    <div class="p-row"><span class="p-label">MTZ straordinaria</span>         <input class="p-input orange" id="san_mtz_s" type="number" step="50" value="1000" min="0"><span class="p-um">€/anno</span></div>
+    <div class="p-row"><span class="p-label">MTZ ordinaria</span>             <input class="p-input orange" id="san_mtz_o" type="number" step="50" value="400"  min="0"><span class="p-um">€/anno</span></div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Costo Totale Lavorazione</div><div class="kpi-val orange" id="san_tot">—</div><div class="kpi-um">€</div></div>
+      <div class="kpi"><div class="kpi-label">Costo per Lt Distillato</div><div class="kpi-val orange" id="san_ltr">—</div><div class="kpi-um">€/Lt</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="br-title">Ripartizione costi</div>
+      <div class="br-row"><span class="br-label">Vapore</span><div class="br-bar-bg"><div class="br-bar" id="san_br_vap"  style="background:var(--orange)"></div></div><span class="br-pct" id="san_pct_vap">—</span></div>
+      <div class="br-row"><span class="br-label">Elettricità</span><div class="br-bar-bg"><div class="br-bar" id="san_br_el"   style="background:var(--yellow)"></div></div><span class="br-pct" id="san_pct_el">—</span></div>
+      <div class="br-row"><span class="br-label">Personale</span><div class="br-bar-bg"><div class="br-bar" id="san_br_pers"  style="background:var(--green)"></div></div><span class="br-pct" id="san_pct_pers">—</span></div>
+      <div class="br-row"><span class="br-label">COD</span><div class="br-bar-bg"><div class="br-bar" id="san_br_cod"  style="background:var(--red)"></div></div><span class="br-pct" id="san_pct_cod">—</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── JOE ─── -->
+<div class="card c-purple">
+  <div class="card-head">
+    <div class="dot"></div>
+    <div><div class="card-title">Joe</div><div class="card-sub">Distillatore Continuo</div></div>
+  </div>
+  <div class="card-body">
+
+    <div class="sec-label">Tipo prodotto</div>
+    <div class="toggle-row">
+      <button class="toggle-btn active-torchiato" id="joe_btn_t" onclick="setJoeType('torchiato')">📦 Torchiato</button>
+      <button class="toggle-btn" id="joe_btn_s" onclick="setJoeType('scarichi')">🪣 Scarichi</button>
+    </div>
+    <!-- Info tipo -->
+    <div id="joe_type_info" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);margin-bottom:4px;padding:4px 8px;background:rgba(167,139,250,.06);border-radius:6px;border:1px solid rgba(167,139,250,.15)">
+      Cap: 3.000 Lt/h · Vol: 13.000 Lt · Olio in: 1,4‰ → out: 0,2‰ · COD: 6 kg
+    </div>
+
+    <div class="sec-label">Parametri di produzione</div>
+    <div class="p-row"><span class="p-label">Capacità lavorazione</span>     <div class="p-val-derived" id="joe_cap_d">—</div><span class="p-um">Lt/h</span></div>
+    <div class="p-row"><span class="p-label">Volume totale trattato</span>    <div class="p-val-derived" id="joe_vol_d">—</div><span class="p-um">Lt</span></div>
+    <div class="p-row"><span class="p-label">Durata ciclo</span>              <div class="p-val-derived" id="joe_dur">—</div><span class="p-um">h</span></div>
+    <div class="p-row"><span class="p-label">Portata vapore</span>            <input class="p-input purple" id="joe_vap_h"  type="number" step="10"  value="1470" min="0"><span class="p-um">kg/h</span></div>
+    <div class="p-row"><span class="p-label">Impianti/operatore</span>        <input class="p-input purple" id="joe_imp"    type="number" step="0.5" value="1.5"  min="0.5"><span class="p-um">n°</span></div>
+    <div class="p-row"><span class="p-label">Bx iniziale</span>               <input class="p-input purple" id="joe_bxi"    type="number" step="0.5" value="9"    min="0"><span class="p-um">Bx</span></div>
+    <div class="p-row"><span class="p-label">Bx finale</span>                <input class="p-input purple" id="joe_bxf"    type="number" step="0.5" value="13.5" min="0.1"><span class="p-um">Bx</span></div>
+    <div class="p-row"><span class="p-label">Conc. olio iniziale</span>       <div class="p-val-derived" id="joe_conci_d">—</div><span class="p-um">‰</span></div>
+    <div class="p-row"><span class="p-label">Conc. olio uscita</span>         <div class="p-val-derived" id="joe_concu_d">—</div><span class="p-um">‰</span></div>
+
+    <div class="sec-label">Calcoli intermedi</div>
+    <div class="p-row"><span class="p-label">Q. olio recuperato</span>        <div class="p-val-derived" id="joe_olio">—</div><span class="p-um">Lt</span></div>
+    <div class="p-row"><span class="p-label">Vapore consumato</span>           <div class="p-val-derived" id="joe_vap_tot">—</div><span class="p-um">kg</span></div>
+    <div class="p-row"><span class="p-label">COD prodotti</span>              <div class="p-val-derived" id="joe_cod_d">—</div><span class="p-um">kg</span></div>
+
+    <div class="sec-label">Manutenzione</div>
+    <div class="p-row"><span class="p-label">MTZ straordinaria</span>          <input class="p-input purple" id="joe_mtz_s" type="number" step="50" value="600" min="0"><span class="p-um">€/anno</span></div>
+    <div class="p-row"><span class="p-label">MTZ ordinaria</span>              <input class="p-input purple" id="joe_mtz_o" type="number" step="50" value="400" min="0"><span class="p-um">€/anno</span></div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Costo Totale Lavorazione</div><div class="kpi-val purple" id="joe_tot">—</div><div class="kpi-um">€</div></div>
+      <div class="kpi"><div class="kpi-label">Costo per Lt Distillato</div><div class="kpi-val purple" id="joe_ltr">—</div><div class="kpi-um">€/Lt</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="br-title">Ripartizione costi</div>
+      <div class="br-row"><span class="br-label">Vapore</span><div class="br-bar-bg"><div class="br-bar" id="joe_br_vap"  style="background:var(--purple)"></div></div><span class="br-pct" id="joe_pct_vap">—</span></div>
+      <div class="br-row"><span class="br-label">Elettricità</span><div class="br-bar-bg"><div class="br-bar" id="joe_br_el"   style="background:var(--teal)"></div></div><span class="br-pct" id="joe_pct_el">—</span></div>
+      <div class="br-row"><span class="br-label">Personale</span><div class="br-bar-bg"><div class="br-bar" id="joe_br_pers"  style="background:var(--green)"></div></div><span class="br-pct" id="joe_pct_pers">—</span></div>
+      <div class="br-row"><span class="br-label">COD</span><div class="br-bar-bg"><div class="br-bar" id="joe_br_cod"  style="background:var(--red)"></div></div><span class="br-pct" id="joe_pct_cod">—</span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ===== DEPURAZIONE + VAPORE ===== -->
+<div class="wrap-bottom">
+
+<!-- ─── DEPURAZIONE ─── -->
+<div class="card c-teal">
+  <div class="card-head">
+    <div class="dot"></div>
+    <div><div class="card-title">Depurazione</div><div class="card-sub">Impianto Trattamento Acque</div></div>
+  </div>
+  <div class="card-body">
+    <div class="sec-label">Parametri impianto (fissi)</div>
+    <div class="p-row"><span class="p-label">Volume annuale</span>       <div class="p-val">64.800</div><span class="p-um">m³/a</span></div>
+    <div class="p-row"><span class="p-label">COD ingresso</span>         <div class="p-val">8.000</div><span class="p-um">mg/L</span></div>
+    <div class="p-row"><span class="p-label">COD uscita limite</span>    <div class="p-val">200</div><span class="p-um">mg/L</span></div>
+    <div class="p-row"><span class="p-label">Energia elettrica</span>    <div class="p-val">700.800</div><span class="p-um">kWh/a</span></div>
+    <div class="sec-label">Consumi chimici annui</div>
+    <div class="p-row"><span class="p-label">Calce</span>                <div class="p-val">30.000</div><span class="p-um">kg/a</span></div>
+    <div class="p-row"><span class="p-label">HCl</span>                  <div class="p-val">3.200</div><span class="p-um">kg/a</span></div>
+    <div class="p-row"><span class="p-label">Ipoclorito</span>           <div class="p-val">750</div><span class="p-um">kg/a</span></div>
+    <div class="p-row"><span class="p-label">Polielettrolita</span>      <div class="p-val">1.500</div><span class="p-um">kg/a</span></div>
+    <div class="p-row"><span class="p-label">Nutrienti batteri</span>    <div class="p-val">5.200</div><span class="p-um">kg/a</span></div>
+    <div class="p-row"><span class="p-label">Fanghi smaltiti</span>      <div class="p-val">490</div><span class="p-um">ton/a</span></div>
+    <div class="sec-label">Personale annuo (ore)</div>
+    <div class="p-row"><span class="p-label">Operai</span>               <div class="p-val">1.275</div><span class="p-um">h/a</span></div>
+    <div class="p-row"><span class="p-label">Laboratorio</span>          <div class="p-val">51</div><span class="p-um">h/a</span></div>
+    <div class="p-row"><span class="p-label">Assistenti</span>           <div class="p-val">204</div><span class="p-um">h/a</span></div>
+    <div class="p-row"><span class="p-label">Direttore</span>            <div class="p-val">510</div><span class="p-um">h/a</span></div>
+    <div class="p-row"><span class="p-label">MTZ + altri</span>          <div class="p-val">15.000</div><span class="p-um">€/a</span></div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Costo €/kg COD rimosso</div><div class="kpi-val teal" id="dep_cod">—</div><div class="kpi-um">€/kg COD</div></div>
+      <div class="kpi"><div class="kpi-label">Costo Totale Annuale</div><div class="kpi-val teal" id="dep_ann">—</div><div class="kpi-um">€/anno</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── COSTO VAPORE ─── -->
+<div class="card c-red">
+  <div class="card-head">
+    <div class="dot"></div>
+    <div><div class="card-title">Caldaia / Vapore</div><div class="card-sub">Costo Produzione Vapore GPL</div></div>
+  </div>
+  <div class="card-body">
+    <div class="sec-label">Dati GPL &amp; caldaia</div>
+    <div class="p-row"><span class="p-label">Consumo GPL annuo</span>        <input class="p-input red" id="v_gpl_kg"   type="number" step="1000" value="502000" min="1"><span class="p-um">kg/a</span></div>
+    <div class="p-row"><span class="p-label">Rapporto kg vap/kg GPL</span>   <input class="p-input red" id="v_rap"      type="number" step="0.1"  value="18.2"   min="0.1"><span class="p-um">kg/kg</span></div>
+    <div class="p-row"><span class="p-label">Ore funzionamento</span>        <input class="p-input red" id="v_ore_funz" type="number" step="100"  value="3000"   min="1"><span class="p-um">h/a</span></div>
+    <div class="p-row"><span class="p-label">Consumi elettrici medi</span>   <input class="p-input red" id="v_el_kw"    type="number" step="0.1"  value="8.12"   min="0"><span class="p-um">kW</span></div>
+    <div class="p-row"><span class="p-label">Ore personale dedicate</span>   <input class="p-input red" id="v_ore_pers" type="number" step="50"   value="500"    min="0"><span class="p-um">h/a</span></div>
+
+    <div class="sec-label">Costi fissi annui</div>
+    <div class="p-row"><span class="p-label">MTZ ordinaria</span>            <input class="p-input red" id="v_mtz"      type="number" step="100"  value="3000"   min="0"><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Verifiche periodiche</span>     <input class="p-input red" id="v_ver"      type="number" step="100"  value="5000"   min="0"><span class="p-um">€/a</span></div>
+
+    <div class="sec-label">Ammortamento</div>
+    <div class="p-row"><span class="p-label">Costo impianto</span>           <input class="p-input red" id="v_cost_imp" type="number" step="10000" value="300000" min="0"><span class="p-um">€</span></div>
+    <div class="p-row"><span class="p-label">Vita utile</span>               <input class="p-input red" id="v_vita"     type="number" step="1"     value="15"     min="1"><span class="p-um">anni</span></div>
+
+    <div class="sec-label">Calcoli intermedi</div>
+    <div class="p-row"><span class="p-label">Produzione vapore annua</span>  <div class="p-val-derived" id="v_prod_ann">—</div><span class="p-um">kg/a</span></div>
+    <div class="p-row"><span class="p-label">Costo GPL annuo</span>          <div class="p-val-derived" id="v_cost_gpl">—</div><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Ammortamento annuo</span>       <div class="p-val-derived" id="v_amm_ann">—</div><span class="p-um">€/a</span></div>
+    <div class="p-row"><span class="p-label">Totale costi annui</span>       <div class="p-val-derived" id="v_tot_fissi">—</div><span class="p-um">€/a</span></div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Costo per kg vapore (con amm.)</div><div class="kpi-val red" id="v_kg">—</div><div class="kpi-um">€/kg</div></div>
+      <div class="kpi"><div class="kpi-label">Costo per tonnellata</div><div class="kpi-val red" id="v_tonn">—</div><div class="kpi-um">€/tonn</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap-bottom -->
+
+<div class="note">
+  <strong>Nota metodologica:</strong>
+  Tutte le formule replicano esattamente il foglio Excel originale (Pilato B6=B8/B5×1.5, B39=B5×B6×B10/1000, ecc.).
+  Per il Joe, i parametri di capacità, volume, concentrazioni e COD cambiano automaticamente al cambio tipo prodotto (IF torchiato / IF scarichi come da Excel).
+  Il costo vapore calcolato a destra alimenta in cascata tutti e tre i distillatori.
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+//  COSTANTI ELETTRICHE (kW installati — da Excel)
+// ──────────────────────────────────────────────
+// PILATO: pompe=[5.5,6.0], torre=15 (ripartita ×0.2), trivella=4, chiller=40 (ripartito ×0.2), pompa_ag=6 (ripartita ×0.042)
+const PIL_EL = { pompe:[5.5,6.0], torre:15, tf:0.2, trivella:4, chiller:40, cf:0.2, pg:6, pgf:0.042 };
+// SANTORO: pompa_vuoto=13, riciclo=17.46, piccole=4.48, pozzo=6, centrifuga=15; util: serbatoi=1.5, torre=15(×0.2), trivella=4
+const SAN_EL = { pv:13, ri:17.46, pi:4.48, pz:6, cen:15, serb:1.5, torre:15, tf:0.2, trivella:4 };
+// JOE: pompe=[5.6,1.5,4,3,1.3,1.3,7.5], centrifuga=3; util: serb=1.5, torre=12(×0.1), trivella=7, chiller=40(×0.1), pg=6(×0.1)
+const JOE_EL = { pompe:[5.6,1.5,4,3,1.3,1.3,7.5], cen:3, serb:1.5, torre:12, tf:0.1, trivella:7, chiller:40, cf:0.1, pg:6, pgf:0.1 };
+
+// DEPURAZIONE — consumi fissi annui
+const DEP = { kwh:700800, calce:30000, hcl:3200, ipo:750, poli:1500, nutr:5200, fanghi:490,
+              ore_op:1275, ore_lab:51, ore_ass:204, ore_dir:510, mtz:10000, altri:5000,
+              mc:64800, cod_in:8000, cod_out:200 };
+
+let joeType = 'torchiato';
+
+// helper: legge input numerico
+function g(id){ return parseFloat(document.getElementById(id)?.value)||0; }
+
+// helper: aggiorna testo con blink
+function s(id, v){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = v;
+  el.classList.remove('blink');
+  void el.offsetWidth; // reflow
+  el.classList.add('blink');
+}
+
+function fmt2(v){ return (isFinite(v)&&v!==0) ? v.toFixed(2) : '—'; }
+function fmt3(v){ return (isFinite(v)&&v!==0) ? v.toFixed(3) : '—'; }
+function fmt4(v){ return (isFinite(v)&&v!==0) ? v.toFixed(4) : '—'; }
+function fmtK(v){ return (isFinite(v)&&v>0) ? Math.round(v).toLocaleString('it-IT') : '—'; }
+
+function bar(id, pct){
+  const el = document.getElementById(id);
+  if(el) el.style.width = Math.max(0,Math.min(100,pct||0))+'%';
+}
+
+function setJoeType(t){
+  joeType = t;
+  document.getElementById('joe_btn_t').className = 'toggle-btn' + (t==='torchiato'?' active-torchiato':'');
+  document.getElementById('joe_btn_s').className = 'toggle-btn' + (t==='scarichi'?' active-scarichi':'');
+
+  // Aggiorna info badge
+  const info = document.getElementById('joe_type_info');
+  if(t==='torchiato'){
+    info.style.borderColor='rgba(167,139,250,.15)';
+    info.style.background='rgba(167,139,250,.06)';
+    info.textContent = 'Cap: 3.000 Lt/h · Vol: 13.000 Lt · Olio in: 1,4‰ → out: 0,2‰ · COD: 6 kg';
+  } else {
+    info.style.borderColor='rgba(251,113,133,.2)';
+    info.style.background='rgba(251,113,133,.06)';
+    info.textContent = 'Cap: 2.300 Lt/h · Vol: 4.500 Lt · Olio in: 2,7‰ → out: 0,4‰ · COD: 70 kg';
+  }
+  info.classList.add('type-change');
+  setTimeout(()=>info.classList.remove('type-change'),350);
+  calc();
+}
+
+function calc(){
+  // ── COSTI UNITARI ──
+  const ee    = g('u_ee');
+  const gpl_p = g('u_gpl');
+  const acq_p = g('u_acqua');
+  const op    = g('u_op');
+  const lab   = g('u_lab');
+  const ass   = g('u_ass');
+  const dir   = g('u_dir');
+  const soda_p  = g('u_soda');
+  const fanghi_p= g('u_fanghi');
+  const poli_p  = g('u_poli');
+  const calce_p = g('u_calce');
+  const nutr_p  = g('u_nutr');
+  const ipo_p   = g('u_ipo');
+  const hcl_p   = g('u_hcl');
+
+  // ────────────────────────────────────────
+  //  COSTO VAPORE
+  // ────────────────────────────────────────
+  const v_gpl_kg   = g('v_gpl_kg');
+  const v_rap      = g('v_rap');
+  const v_ore_funz = g('v_ore_funz');
+  const v_el_kw    = g('v_el_kw');
+  const v_ore_pers = g('v_ore_pers');
+  const v_mtz      = g('v_mtz');
+  const v_ver      = g('v_ver');
+  const v_cost_imp = g('v_cost_imp');
+  const v_vita     = g('v_vita');
+
+  const v_prod     = v_gpl_kg * v_rap;                          // kg vapore annui
+  const v_gpl_cost = v_gpl_kg * gpl_p;                         // costo GPL annuo
+  const v_el_cost  = v_el_kw * v_ore_funz * ee;                // energia elettrica caldaia
+  const v_acq_cost = (v_prod/1000) * acq_p;                    // acqua trattata (mc ≈ tonn)
+  const v_pers_cost= v_ore_pers * op;
+  const v_amm      = v_cost_imp / v_vita;
+  const v_fissi    = v_mtz + v_el_cost + v_acq_cost + v_pers_cost + v_ver;
+  const v_tot_ann  = v_gpl_cost + v_fissi + v_amm;
+  const vap_kg     = v_prod>0 ? v_tot_ann/v_prod : 0;          // €/kg vapore (CON ammortamento)
+  const vap_tonn   = vap_kg * 1000;
+
+  s('v_prod_ann',  fmtK(v_prod));
+  s('v_cost_gpl',  fmtK(v_gpl_cost));
+  s('v_amm_ann',   fmtK(v_amm));
+  s('v_tot_fissi', fmtK(v_tot_ann));
+  s('v_kg',   fmt4(vap_kg));
+  s('v_tonn', fmt2(vap_tonn));
+
+  // ────────────────────────────────────────
+  //  DEPURAZIONE
+  // ────────────────────────────────────────
+  const dep_ee     = DEP.kwh    * ee;
+  const dep_calce  = DEP.calce  * calce_p;
+  const dep_hcl    = DEP.hcl    * hcl_p;
+  const dep_ipo    = DEP.ipo    * ipo_p;
+  const dep_poli   = DEP.poli   * poli_p;
+  const dep_nutr   = DEP.nutr   * nutr_p;
+  const dep_fanghi = DEP.fanghi * fanghi_p;
+  const dep_pers   = DEP.ore_op*op + DEP.ore_lab*lab + DEP.ore_ass*ass + DEP.ore_dir*dir;
+  const dep_tot    = dep_ee+dep_calce+dep_hcl+dep_ipo+dep_poli+dep_nutr+dep_fanghi+dep_pers+DEP.mtz+DEP.altri;
+  const dep_cod_tot= DEP.mc*(DEP.cod_in-DEP.cod_out)/1000;     // kg COD rimosso/anno
+  const dep_ckg    = dep_cod_tot>0 ? dep_tot/dep_cod_tot : 0;  // €/kg COD
+
+  s('dep_cod', fmt4(dep_ckg));
+  s('dep_ann', fmtK(dep_tot));
+
+  // ────────────────────────────────────────
+  //  PILATO
+  //  Formule Excel:
+  //  B6  = B8/B5*1.5         (durata bollata)
+  //  B39 = (B5*B6*B10)/1000  (olio recuperato)
+  //  B40 = B7*B6             (consumo vapore)
+  //  B41 = (B23+B24)*B6      (el. pompe)
+  //  B42 = (B29+B30+B32+B34)*B6  (el. utilities)
+  //  B44 = 66*B6             (COD kg)
+  //  B50 = (B16*B6)/B9       (costo personale)
+  //  B51 = 37 fisso → ricalcolato con soda aggiornata
+  //  B52 = (B17+B18)/200     (costo mtz)
+  //  B57 = SUM(B48:B53)
+  //  B58 = B57/B39
+  // ────────────────────────────────────────
+  const p_cap   = g('pil_cap');
+  const p_vol   = g('pil_vol');
+  const p_vap_h = g('pil_vap_h');
+  const p_imp   = g('pil_imp');
+  const p_conc  = g('pil_conc');
+
+  const p_dur      = p_cap>0 ? (p_vol/p_cap)*1.5 : 0;          // B6=B8/B5*1.5
+  const p_olio     = (p_cap*p_dur*p_conc)/1000;                 // B39
+  const p_vap_tot  = p_vap_h * p_dur;                           // B40
+
+  // Elettricità: B41=(B23+B24)*B6
+  const p_el_pompe = (PIL_EL.pompe.reduce((a,b)=>a+b,0)) * p_dur;
+  // B42=(B29+B30+B32+B34)*B6  B29=B28*0.2  B32=B31*0.2  B34=B33*0.042
+  const p_torre_r  = PIL_EL.torre   * PIL_EL.tf;
+  const p_chiller_r= PIL_EL.chiller * PIL_EL.cf;
+  const p_pg_r     = PIL_EL.pg      * PIL_EL.pgf;
+  const p_el_util  = (p_torre_r + PIL_EL.trivella + p_chiller_r + p_pg_r) * p_dur;
+  const p_el_total = p_el_pompe + p_el_util;
+
+  const p_cod      = 66 * p_dur;                                 // B44
+
+  s('pil_dur',     p_dur.toFixed(2));
+  s('pil_olio',    fmt2(p_olio));
+  s('pil_vap_tot', fmtK(p_vap_tot));
+  s('pil_el_tot',  fmt2(p_el_total));
+  s('pil_cod',     fmt2(p_cod));
+
+  const p_c_vap  = p_vap_tot * vap_kg;                          // B48
+  const p_c_el   = p_el_total * ee;                             // B49
+  const p_c_pers = p_imp>0 ? (op*p_dur)/p_imp : 0;             // B50
+  // B51=37 (soda): manteniamo la quantità originale (37/0.55 kg soda) al prezzo aggiornato
+  const p_soda_kg= 37/0.55;
+  const p_c_soda = p_soda_kg * soda_p;                          // B51 ricalcolato
+  const p_c_mtz  = (g('pil_mtz_s')+g('pil_mtz_o'))/200;        // B52
+  const p_c_cod  = p_cod * dep_ckg;                             // B53
+
+  const p_tot    = p_c_vap+p_c_el+p_c_pers+p_c_soda+p_c_mtz+p_c_cod;  // B57
+  const p_ltr    = p_olio>0 ? p_tot/p_olio : 0;                 // B58
+
+  s('pil_tot', fmt2(p_tot));
+  s('pil_ltr', fmt2(p_ltr));
+
+  if(p_tot>0){
+    const ppv=p_c_vap/p_tot*100, ppe=p_c_el/p_tot*100, ppp=p_c_pers/p_tot*100;
+    const ppc=(p_c_cod+p_c_soda)/p_tot*100;
+    bar('pil_br_vap',ppv); s('pil_pct_vap',ppv.toFixed(1)+'%');
+    bar('pil_br_el', ppe); s('pil_pct_el', ppe.toFixed(1)+'%');
+    bar('pil_br_pers',ppp);s('pil_pct_pers',ppp.toFixed(1)+'%');
+    bar('pil_br_cod', ppc);s('pil_pct_cod', ppc.toFixed(1)+'%');
+  }
+
+  // ────────────────────────────────────────
+  //  SANTORO
+  //  B6  = B7/B5             (durata ciclo)
+  //  B40 = B7*(B12-B13)/1000 (olio recuperato)
+  //  B41 = B10*B6            (vapore consumato)
+  //  B42 = B25*B6            (el pompa vuoto)
+  //  B43 = (B26+B27+B28)*B6  (el pompe riciclo+piccole+pozzo)
+  //  B44 = (B33+B34+B35+B36)*B6  (el utilities: serbatoi+torre+torrer+trivella)
+  //  B45 = B29*B6            (el centrifuga)
+  //  B46 = B42+B43+B44+B45
+  //  B47 = 6 (kg COD fisso)
+  //  B53 = B6*B18/B11        (personale)
+  //  B54 = 120 fisso (avviamento+lavaggio)
+  //  B55 = (B19+B20)/200     (mtz)
+  //  B57 = B47*B21           (COD)
+  //  B61 = SUM(B51:B57)
+  //  B65 = B61/B40
+  // ────────────────────────────────────────
+  const s_cap  = g('san_cap');
+  const s_vol  = g('san_vol');
+  const s_vp_h = g('san_vap_h');
+  const s_bxi  = g('san_bxi');
+  const s_bxf  = g('san_bxf');
+  const s_imp  = g('san_imp');
+  const s_ci   = g('san_conci');
+  const s_cu   = g('san_concu');
+
+  const s_dur     = s_cap>0 ? s_vol/s_cap : 0;                  // B6=B7/B5
+  const s_olio    = s_vol*(s_ci-s_cu)/1000;                     // B40
+  const s_vap_tot = s_vp_h * s_dur;                             // B41
+
+  const s_pv    = SAN_EL.pv  * s_dur;                           // B42
+  const s_pompe = (SAN_EL.ri+SAN_EL.pi+SAN_EL.pz) * s_dur;     // B43
+  const s_torre_r = SAN_EL.torre * SAN_EL.tf;
+  const s_util  = (SAN_EL.serb+SAN_EL.torre+s_torre_r+SAN_EL.trivella)*s_dur; // B44
+  const s_cen   = SAN_EL.cen * s_dur;                           // B45
+  const s_el_total = s_pv+s_pompe+s_util+s_cen;                 // B46
+
+  s('san_dur',     s_dur.toFixed(2));
+  s('san_olio',    fmt2(s_olio));
+  s('san_vap_tot', fmtK(s_vap_tot));
+  s('san_el_tot',  fmt2(s_el_total));
+
+  const s_c_vap  = s_vap_tot * vap_kg;                          // B51
+  const s_c_el   = s_el_total * ee;                             // B52
+  const s_c_pers = s_imp>0 ? s_dur*op/s_imp : 0;               // B53
+  const s_c_avv  = 120;                                         // B54 fisso
+  const s_c_mtz  = (g('san_mtz_s')+g('san_mtz_o'))/200;        // B55
+  const s_c_ammort= 0;                                          // B56=0
+  const s_c_cod  = 6 * dep_ckg;                                 // B57 (6 kg COD fisso)
+
+  const s_tot    = s_c_vap+s_c_el+s_c_pers+s_c_avv+s_c_mtz+s_c_ammort+s_c_cod; // B61
+  const s_ltr    = s_olio>0 ? s_tot/s_olio : 0;                 // B65
+
+  s('san_tot', fmt2(s_tot));
+  s('san_ltr', fmt2(s_ltr));
+
+  if(s_tot>0){
+    const spv=s_c_vap/s_tot*100, spe=s_c_el/s_tot*100, spp=s_c_pers/s_tot*100, spc=s_c_cod/s_tot*100;
+    bar('san_br_vap',spv); s('san_pct_vap',spv.toFixed(1)+'%');
+    bar('san_br_el', spe); s('san_pct_el', spe.toFixed(1)+'%');
+    bar('san_br_pers',spp);s('san_pct_pers',spp.toFixed(1)+'%');
+    bar('san_br_cod', spc);s('san_pct_cod', spc.toFixed(1)+'%');
+  }
+
+  // ────────────────────────────────────────
+  //  JOE
+  //  B5  = tipo (torchiato | scarichi)
+  //  B6  = IF torchiato→3000  scarichi→2300
+  //  B8  = IF torchiato→13000 scarichi→4500
+  //  B7  = B8/B6              (durata ciclo)
+  //  B13 = IF torchiato→1.4   scarichi→2.7  (conc. in)
+  //  B14 = IF torchiato→0.2   scarichi→0.4  (conc. out)
+  //  B49 = B8*(B13-B14)/1000  (olio recuperato)
+  //  B50 = B11*B7             (vapore consumato)
+  //  B51 = (B27+..+B33)*B7   (el pompe, NO centrifuga)
+  //  B52 = (B38+B40+B41+B43+B45)*B7  (el utilities)
+  //  B53 = B34*B7             (el centrifuga)
+  //  B54 = B51+B52+B53
+  //  B55 = IF torchiato→6  scarichi→70
+  //  B59 = B50*B18            (costo vapore)
+  //  B60 = B54*B19            (costo el)
+  //  B61 = (B20/B12)*B7       (costo personale)
+  //  B62 = B20/B12+25/2       (avviamento+lavaggio)
+  //  B63 = (B21+B22)/200      (mtz)
+  //  B64 = B55*B23            (COD)
+  //  B68 = SUM(B59:B63)  — NB: B64 NON è in SUM come da Excel!
+  //  B72 = B68/B49
+  // ────────────────────────────────────────
+  const jT    = joeType==='torchiato';
+  const j_cap   = jT ? 3000  : 2300;
+  const j_vol   = jT ? 13000 : 4500;
+  const j_conci = jT ? 1.4   : 2.7;
+  const j_concu = jT ? 0.2   : 0.4;
+  const j_cod_q = jT ? 6     : 70;
+
+  s('joe_vol_d',   j_vol.toLocaleString('it-IT'));
+  s('joe_cap_d',   j_cap.toLocaleString('it-IT'));
+  s('joe_conci_d', j_conci.toFixed(1));
+  s('joe_concu_d', j_concu.toFixed(1));
+  s('joe_cod_d',   j_cod_q);
+
+  const j_vap_h = g('joe_vap_h');
+  const j_imp   = g('joe_imp');
+
+  const j_dur     = j_cap>0 ? j_vol/j_cap : 0;                  // B7=B8/B6
+  const j_olio    = j_vol*(j_conci-j_concu)/1000;               // B49
+  const j_vap_tot = j_vap_h * j_dur;                            // B50
+
+  // B51: (B27+B28+B29+B30+B31+B32+B33)*B7 — tutte pompe tranne centrifuga
+  const j_el_pompe = JOE_EL.pompe.reduce((a,b)=>a+b,0) * j_dur;
+  // B52: (B38+B40+B41+B43+B45)*B7  B40=torre×0.1  B43=chiller×0.1  B45=pg×0.1
+  const j_t_r  = JOE_EL.torre  * JOE_EL.tf;
+  const j_ch_r = JOE_EL.chiller* JOE_EL.cf;
+  const j_pg_r = JOE_EL.pg     * JOE_EL.pgf;
+  const j_el_util = (JOE_EL.serb+j_t_r+JOE_EL.trivella+j_ch_r+j_pg_r)*j_dur;
+  // B53: centrifuga
+  const j_el_cen = JOE_EL.cen * j_dur;
+  const j_el_total= j_el_pompe+j_el_util+j_el_cen;              // B54
+
+  s('joe_dur',     j_dur.toFixed(2));
+  s('joe_olio',    fmt2(j_olio));
+  s('joe_vap_tot', fmtK(j_vap_tot));
+
+  const j_c_vap  = j_vap_tot * vap_kg;                          // B59
+  const j_c_el   = j_el_total * ee;                             // B60
+  const j_c_pers = j_imp>0 ? (op/j_imp)*j_dur : 0;             // B61=(B20/B12)*B7
+  const j_c_avv  = j_imp>0 ? op/j_imp+25/2 : 0;                // B62=B20/B12+25/2
+  const j_c_mtz  = (g('joe_mtz_s')+g('joe_mtz_o'))/200;        // B63
+  const j_c_cod  = j_cod_q * dep_ckg;                           // B64=B55*B23
+
+  // B68=SUM(B59:B63) — da Excel SUM(B59:B63) = vap+el+pers+avv+mtz (NON include B64 in SUM)
+  const j_tot    = j_c_vap+j_c_el+j_c_pers+j_c_avv+j_c_mtz;   // SUM(B59:B63)
+  const j_ltr    = j_olio>0 ? j_tot/j_olio : 0;                 // B72=B68/B49
+
+  s('joe_tot', fmt2(j_tot));
+  s('joe_ltr', fmt2(j_ltr));
+
+  if(j_tot>0){
+    const jpv=j_c_vap/j_tot*100, jpe=j_c_el/j_tot*100, jpp=j_c_pers/j_tot*100, jpc=j_c_cod/j_tot*100;
+    bar('joe_br_vap',jpv); s('joe_pct_vap',jpv.toFixed(1)+'%');
+    bar('joe_br_el', jpe); s('joe_pct_el', jpe.toFixed(1)+'%');
+    bar('joe_br_pers',jpp);s('joe_pct_pers',jpp.toFixed(1)+'%');
+    bar('joe_br_cod', jpc);s('joe_pct_cod', jpc.toFixed(1)+'%');
+  }
+
+  document.getElementById('ts').textContent = new Date().toLocaleTimeString('it-IT');
+}
+
+// Debounce su tutti gli input
+let tm;
+document.querySelectorAll('input[type=number]').forEach(el=>{
+  el.addEventListener('input',()=>{ clearTimeout(tm); tm=setTimeout(calc,100); });
+});
+
+calc();
+</script>
+</body>
+</html>
