@@ -710,7 +710,7 @@ function calc(){
   const p_conc  = g('pil_conc');
 
   const p_dur      = p_cap>0 ? (p_vol/p_cap)*1.5 : 0;          // B6=B8/B5*1.5
-  const p_olio     = (p_cap*p_dur*p_conc)/1000;                 // B39
+  const p_olio     = (p_vol * p_conc) / 1000;                   // B39 = volume × concentrazione / 1000
   const p_vap_tot  = p_vap_h * p_dur;                           // B40
 
   // Elettricità: B41=(B23+B24)*B6
